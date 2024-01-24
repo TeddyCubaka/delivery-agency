@@ -2,23 +2,46 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
+from .models import Address, Province, Commune, Ville
+from .serializers import AddressSerializer, ProvinceSerializer, VilleSerializer, CommuneSerializer
+from rest_framework.decorators import api_view
 
-class TodoListApiView(APIView):
-    # add permission to check if user is authenticated
-    permission_classes = [permissions.IsAuthenticated]
+class AddressView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
-    # 1. List all
     def get(self, request, *args, **kwargs):
         '''
-        List all the todo items for given requested user
+        List all the address for given requested user
         '''
-        res = {'code': 200, 'message' : 'nothing to show'}
-        return Response(res, status=status.HTTP_200_OK)
+        address = Address.objects.all()
+        serializer = AddressSerializer(address, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # 2. Create
     def post(self, request, *args, **kwargs):
         '''
-        Create the Todo with given todo data
+        Create all addresses and his dependencies
         '''
-        res = {'code': 200, 'message' : 'nothing to show'}
-        return Response(res, status=status.HTTP_200_OK)
+        data = {
+            'Description': request.data.get('Description'), 
+            'NomCategorie': request.data.get('NomCategorie'), 
+        }
+        serializer = AddressSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VilleView(APIView):
+    def get (self, request, *args, **kwargs):
+        '''get all ville'''
+        cities = Ville.objects.all()
+        serializer = VilleSerializer(cities, many=True)
+        return Response({"code": 200, "args" : request.GET, "data" : serializer.data}, status=status.HTTP_200_OK)
+    
+class ProvinceView(APIView):
+    def get (self, request, *args, **kwargs):
+        '''get all ville'''
+        cities = Province.objects.all()
+        serializer = ProvinceSerializer(cities, many=True)
+        return Response({"code": 200, "data" : serializer.data}, status=status.HTTP_200_OK)
