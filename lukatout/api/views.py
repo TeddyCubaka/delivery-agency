@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
-from .models import Address, Province, Commune, Ville
+from .models import Address, Province, City, Township
 from .serializers import AddressSerializer, ProvinceSerializer, VilleSerializer, CommuneSerializer
 from rest_framework.decorators import api_view
 
@@ -35,7 +35,7 @@ class AddressView(APIView):
 class VilleView(APIView):
     def get (self, request, *args, **kwargs):
         '''get all ville'''
-        cities = Ville.objects.all()
+        cities = City.objects.all()
         serializer = VilleSerializer(cities, many=True)
         return Response({"code": 200, "args" : request.GET, "data" : serializer.data}, status=status.HTTP_200_OK)
     

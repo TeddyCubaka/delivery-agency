@@ -1,8 +1,5 @@
 from rest_framework import serializers
-from .models import Address
-from .models import Province
-from .models import Ville
-from .models import Commune
+from .models import Address, Province, City, Township
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,10 +15,10 @@ class ProvinceSerializer(serializers.ModelSerializer):
 class VilleSerializer(serializers.ModelSerializer):
     province = ProvinceSerializer()
     class Meta:
-        model = Ville
+        model = City
         fields = ('id', 'label', 'created_by_user', 'province' )
 
 class CommuneSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Commune
+        model = Township
         fields = '__all__'
