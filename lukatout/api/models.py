@@ -1,21 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
-# , AbstractUser
-
-# class User(AbstractUser):
-#     phone = models.CharField(max_length=9, unique=True)
-#     def get_full_name(self):
-#         '''get full name of a user'''
-#         return f"{self.first_name} {self.last_name}"
-
-#     def get_phone_number(self):
-#         '''get user phone number'''
-#         return self.phone
+from user.models import User
+from django.utils import timezone
 
 class Country(models.Model):
     '''rf_country modal'''
     id = models.UUIDField(primary_key=True)
     label = models.CharField(max_length=50)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by_user = models.ForeignKey(User, models.PROTECT)
     class Meta:
         '''db table's name'''
@@ -26,6 +18,8 @@ class Province(models.Model):
     id = models.UUIDField(primary_key=True)
     label = models.CharField(max_length=50)
     country = models.ForeignKey(Country, models.PROTECT, default=1)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by_user = models.ForeignKey(User, models.PROTECT)
     class Meta:
         '''db table's name'''
@@ -36,6 +30,8 @@ class City(models.Model):
     id = models.UUIDField(primary_key=True)
     label = models.CharField(max_length=50)
     province = models.ForeignKey(Province, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by_user = models.ForeignKey(User, on_delete=models.PROTECT)
     class Meta:
         '''db table's name'''
@@ -46,6 +42,8 @@ class Township(models.Model):
     id = models.UUIDField(primary_key=True)
     label = models.CharField(max_length=50)
     city = models.ForeignKey(City, on_delete=models.PROTECT)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by_user = models.ForeignKey(User, on_delete=models.PROTECT)
     class Meta:
         '''db table's name'''
@@ -59,6 +57,8 @@ class Address(models.Model):
     province = models.ForeignKey(Province, on_delete=models.PROTECT)
     city = models.ForeignKey(City, on_delete=models.PROTECT, default=None)
     township = models.ForeignKey(Township, on_delete=models.PROTECT, default=1)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by_user = models.ForeignKey(User, models.PROTECT)  
     class Meta:
         '''class meta for this modal'''
