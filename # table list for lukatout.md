@@ -17,7 +17,7 @@
 - catégorie des agent
 - sys user role
 - position des livreurs
-- marchant
-- catégorie des marchant
+- merchant
+- catégorie des merchant
 - devise monetaire
 - système d'unité de mésure
