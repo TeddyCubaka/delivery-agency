@@ -1,11 +1,13 @@
+import uuid
 from django.db import models
 from user.models import User
 from django.utils import timezone
 
 class Country(models.Model):
     '''rf_country modal'''
-    id = models.UUIDField(primary_key=True)
-    label = models.CharField(max_length=50)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    label = models.CharField(max_length=50, unique=True)
+    acronym = models.CharField(max_length=3, default=None)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     created_by_user = models.ForeignKey(User, models.PROTECT)
@@ -15,7 +17,7 @@ class Country(models.Model):
 
 class Province(models.Model):
     '''province modal'''
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     label = models.CharField(max_length=50)
     country = models.ForeignKey(Country, models.PROTECT, default=1)
     created_at = models.DateTimeField(default=timezone.now)
@@ -27,7 +29,7 @@ class Province(models.Model):
 
 class City(models.Model):
     '''province modal'''
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     label = models.CharField(max_length=50)
     province = models.ForeignKey(Province, on_delete=models.PROTECT)
     created_at = models.DateTimeField(default=timezone.now)
@@ -39,7 +41,7 @@ class City(models.Model):
 
 class Township(models.Model):
     '''province modal'''
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     label = models.CharField(max_length=50)
     city = models.ForeignKey(City, on_delete=models.PROTECT)
     created_at = models.DateTimeField(default=timezone.now)
@@ -51,7 +53,7 @@ class Township(models.Model):
 
 class Address(models.Model):
     ''' class modal for all address in the system. '''
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     province = models.ForeignKey(Province, on_delete=models.PROTECT)
     city = models.ForeignKey(City, on_delete=models.PROTECT, default=None)
     township = models.ForeignKey(Township, on_delete=models.PROTECT, default=1)
@@ -61,3 +63,6 @@ class Address(models.Model):
     class Meta:
         '''class meta for this modal'''
         db_table = 'op_address'
+        # constraints = [
+        #     models.UniqueConstraint(fields=['province', 'city', 'township'], name='unique_address')
+        # ]

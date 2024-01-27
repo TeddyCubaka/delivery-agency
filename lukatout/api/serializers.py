@@ -1,24 +1,55 @@
 from rest_framework import serializers
-from .models import Address, Province, City, Township
-
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = ['id','province_id','ville_id','commune_id','created_by_user_id']
-
+from .models import Address, Province, City, Township, Country
 
 class ProvinceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Province
         fields = '__all__'
 
-class VilleSerializer(serializers.ModelSerializer):
-    province = ProvinceSerializer()
+class CitySerializer(serializers.ModelSerializer):
+    # province = ProvinceSerializer(read_only=True)
     class Meta:
         model = City
         fields = ('id', 'label', 'created_by_user', 'province' )
 
-class CommuneSerializer(serializers.ModelSerializer):
+class TownshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Township
-        fields = '__all__'
+        fields = ('id', 'label', 'city', 'created_by_user')
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ('id', 'label', 'city', 'created_by_user')
+
+class AddressSerializer(serializers.ModelSerializer):
+    province = serializers.PrimaryKeyRelatedField(queryset=Province.objects.all())
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
+    township = serializers.PrimaryKeyRelatedField(queryset=Township.objects.all())
+
+    class Meta:
+        model = Address
+        fields = ('id', 'province', 'city', 'township', 'created_by_user')
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        city = instance.city
+        province = instance.province
+        township = instance.township
+        city_representation = CitySerializer(city).data
+        province_representation = ProvinceSerializer(province).data
+        township_representation = TownshipSerializer(township).data
+        representation['city'] = {
+            'id' : city_representation["id"],
+            'label' : city_representation['label']
+        }
+        representation['province'] ={
+            'id' : province_representation["id"],
+            'label' : province_representation['label']
+        }
+    
+        representation['township'] ={
+            'id' : township_representation["id"],
+            'label' : township_representation['label']
+        }
+        return representation
