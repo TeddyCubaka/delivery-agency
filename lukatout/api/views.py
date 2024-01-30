@@ -10,9 +10,14 @@ from rest_framework.exceptions import ValidationError
 class AddressView(APIView):
     # permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
-        '''
-        List all the address for given requested user
-        '''
+        '''List all the address for given requested user'''
+        data = {
+            'province': request.data.get('province'),
+            'city': request.data.get('city'), 
+            'township': request.data.get('township'), 
+            'created_by_user': request.data.get('created_by_user'),
+        }
+        # address = Address.objects.filter(**data)
         address = Address.objects.all()
         serializer = AddressSerializer(address, many=True, context={'request': request})
         response_message = f"nous avons {len(serializer.data)} adresse{'s' if len(serializer.data) > 1 else ''} enreigistrée{'s' if len(serializer.data) > 1 else ''}"
