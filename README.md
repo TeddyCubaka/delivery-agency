@@ -8,8 +8,10 @@
 - activate your environnement space. Make sure you have ``Python`` already installed. type this cammand in your terminal:
 
 ```bash
+# first do this
+python3 -m venv env
 # on linux 
-source bin/activate
+source env/bin/activate
 
 # on windows 
 .\env\Scripts\activate
