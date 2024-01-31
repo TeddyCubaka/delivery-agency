@@ -2,6 +2,7 @@
 from django.urls import path, include
 from . import views
 from user import urls as user_urls
+from vehicule import urls as vehicule_urls
 
 urlpatterns = [
     path('address', views.AddressView.as_view()),
@@ -9,5 +10,6 @@ urlpatterns = [
     path('address/province', views.ProvinceView.as_view(), name='province'),
     path('address/country', views.CountryView.as_view(), name='country'),
     path('address/township', views.TownshipView.as_view(), name='country'),
-    path('user/', include(user_urls))
+    path('user/', include(user_urls)),
+    path('vehicule/', include(vehicule_urls))
 ]
