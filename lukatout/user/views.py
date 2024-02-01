@@ -1,11 +1,14 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import check_password
+from rest_framework.response import Response
 
 from .models import User, Person, Agent
 from .serializers import UserSerializer, PersonSerializer, AgentSerializer
 from api.views import AddressView, Address, AddressSerializer
+from .utils import Utils
 
 class SignupView(APIView):
     def post(self, request):
@@ -91,3 +94,46 @@ class SignupView(APIView):
             Person.objects.filter(id=person_serializer.data['id']).delete()
             User.objects.filter(id=user_data['id']).delete()
             return Response(user_to_create_serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+class LoginView(APIView):
+    def post(self, request):
+        login = request.data.get('login')
+        password = request.data.get('password')
+        if login == None or password == None:
+            response = {
+                'code' : 400,
+                'message' : 'Certaines clés sont manquantes',
+                'data' : []
+            }
+            return Response(response, status=400)
+
+        try:
+            if Utils.is_number(login):
+                user = User.objects.get(phone_number=login)
+            elif Utils.is_valid_email(login):
+                user = User.objects.get(email=login)
+
+            if check_password(password, user.password):
+                user_serializer = UserSerializer(user, many=False, context={'request': request})
+                user_id = user_serializer.data['id']
+                agent = Agent.objects.get(created_by_user_id=user_id)
+
+                agent_serializer = AgentSerializer(agent, many=False, context={'request': request})
+                agent_id = agent_serializer.data['id']
+                del agent_serializer.data['id']
+
+                response_data = {
+                    'code' : 200,
+                    'message': 'Connexion réussie.',
+                    'data': {
+                        'user_id': user_id,
+                        'agent_id': agent_id,
+                        **agent_serializer.data,
+                    }
+                }
+
+                return Response( response_data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Identifiants invalides.'}, status=400)
+        except User.DoesNotExist:
+            return Response({'message': 'Identifiants invalides.'}, status=400)
