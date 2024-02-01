@@ -57,13 +57,6 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Identifiants invalides')
         return user
 
-
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super(MyTokenObtainPairSerializer, cls).get_token(user)
-
-#         # Add custom claims
-#         token['username'] = user.username
-#         return token
+class TokenObtainSerializer(serializers.Serializer):
+    email = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
