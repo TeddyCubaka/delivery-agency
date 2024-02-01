@@ -4,19 +4,21 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from .models import User, Person, Agent
 from .serializers import UserSerializer, PersonSerializer, AgentSerializer, TokenObtainSerializer
-from api.views import AddressView, Address, AddressSerializer
+from api.views import Address, AddressSerializer
 from .utils import Utils
 
 class Auth :
     def generate_token(user):
-        token = AccessToken.for_user(user)
-        token_string = str(token)
-        return token_string
+        access_token = AccessToken.for_user(user)
+        refresh_token = RefreshToken.for_user(user)
+        access_token_string = str(access_token)
+        refresh_token_string = str(refresh_token)
+
+        return {'access' : access_token_string, 'refresh' : refresh_token_string}
 
 class SignupView(APIView):
     def post(self, request):
